@@ -238,8 +238,19 @@ function getWeekNumberByDate(date) {
  * Date(2024, 0, 13) => Date(2024, 8, 13)
  * Date(2023, 1, 1) => Date(2023, 9, 13)
  */
-function getNextFridayThe13th(/* date */) {
-  throw new Error('Not implemented');
+function getNextFridayThe13th(date) {
+  let res;
+  const currentDate = new Date(date);
+  currentDate.setDate(13);
+  const right = true;
+  do {
+    if (currentDate.getDay() === 5) {
+      res = currentDate;
+      break;
+    }
+    currentDate.setMonth(currentDate.getMonth() + 1);
+  } while (right);
+  return res;
 }
 
 /**
@@ -253,8 +264,15 @@ function getNextFridayThe13th(/* date */) {
  * Date(2024, 5, 1) => 2
  * Date(2024, 10, 10) => 4
  */
-function getQuarter(/* date */) {
-  throw new Error('Not implemented');
+function getQuarter(date) {
+  const targetDate = new Date(date);
+  const month = targetDate.getMonth();
+  let res;
+  if (month >= 0 && month <= 2) res = 1;
+  else if (month > 2 && month <= 5) res = 2;
+  else if (month > 5 && month <= 8) res = 3;
+  else if (month > 8 && month <= 11) res = 4;
+  return res;
 }
 
 /**
@@ -275,8 +293,39 @@ function getQuarter(/* date */) {
  * { start: '01-01-2024', end: '15-01-2024' }, 1, 3 => ['01-01-2024', '05-01-2024', '09-01-2024', '13-01-2024']
  * { start: '01-01-2024', end: '10-01-2024' }, 1, 1 => ['01-01-2024', '03-01-2024', '05-01-2024', '07-01-2024', '09-01-2024']
  */
-function getWorkSchedule(/* period, countWorkDays, countOffDays */) {
-  throw new Error('Not implemented');
+function getWorkSchedule(period, countWorkDays, countOffDays) {
+  const startString = period.start;
+  const endString = period.end;
+  const [day, month, year] = startString.split('-');
+  const [day2, month2, year2] = endString.split('-');
+  const resStart = `${year}-${month}-${day}`;
+  const resEnd = `${year2}-${month2}-${day2}`;
+  const start = new Date(resStart);
+  const end = new Date(resEnd);
+  const allDateArr = [];
+
+  while (start <= end) {
+    allDateArr.push(new Date(start));
+    start.setDate(start.getDate() + 1);
+  }
+
+  const dateStringArr = allDateArr.map(function stringDays(elem) {
+    const day3 = String(elem.getDate()).padStart(2, '0');
+    const month3 = String(elem.getMonth() + 1).padStart(2, '0');
+    const year3 = elem.getFullYear();
+    return `${day3}-${month3}-${year3}`;
+  });
+
+  const result = [];
+  let index = 0;
+  while (index < dateStringArr.length) {
+    for (let i = 0; i < countWorkDays && index < dateStringArr.length; i += 1) {
+      result.push(dateStringArr[index]);
+      index += 1;
+    }
+    index += countOffDays;
+  }
+  return result;
 }
 
 /**
